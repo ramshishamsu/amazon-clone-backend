@@ -20,23 +20,13 @@ const allowedOrigins = [
 
 app.use(
   cors({
-    origin: function (origin, callback) {
-      // allow requests with no origin (Postman, server-to-server)
-      if (!origin) return callback(null, true);
-
-      if (allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    origin: "*", // Temporary fix - allow all origins
+    credentials: false,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"]
   })
 );
 app.use(express.json());
-app.use(corsConfig);
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/cart", cartRoutes);
