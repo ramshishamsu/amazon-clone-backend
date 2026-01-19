@@ -25,7 +25,7 @@ app.use(
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"]
   })
-);
+); // Updated for Render deployment
 app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
