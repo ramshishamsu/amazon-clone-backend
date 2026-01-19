@@ -153,5 +153,10 @@ export const removeFromCart = async (req, res) => {
   );
 
   await cart.save();
-  res.json(cart);
+  
+  // Return populated cart
+  const populatedCart = await Cart.findOne({ userId: req.user.id })
+    .populate("items.productId");
+    
+  res.json(populatedCart);
 };
