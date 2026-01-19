@@ -20,7 +20,7 @@ const allowedOrigins = [
 
 app.use(
   cors({
-    origin: "*", // Temporary fix - allow all origins
+    origin: allowedOrigins, // Use specific origins
     credentials: false,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"]
