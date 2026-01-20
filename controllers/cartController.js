@@ -6,36 +6,20 @@ import Cart from "../models/Cart.js";
  */
 export const getCart = async (req, res) => {
   try {
-    console.log("Getting cart for user:", req.user.id);
-    
     const cart = await Cart.findOne({ userId: req.user.id })
       .populate("items.productId");
 
-    console.log("Cart found:", cart);
-    console.log("Cart items:", cart?.items || []);
-
     if (!cart) {
-      console.log("No cart found for user, creating empty cart response");
-      return res.json({ items: [], totalAmount: 0 });
+      return res.status(200).json({ items: [] });
     }
 
-    // Calculate total amount
-    const totalAmount = cart.items.reduce((total, item) => {
-      return total + (item.productId?.price || 0) * item.quantity;
-    }, 0);
-
-    const response = {
-      items: cart.items,
-      totalAmount: totalAmount
-    };
-
-    console.log("Returning cart response:", response);
-    res.json(response);
+    res.status(200).json(cart);
   } catch (error) {
-    console.error("Error in getCart:", error);
-    res.status(500).json({ message: error.message });
+    console.error("Get cart error:", error);
+    res.status(500).json({ message: "Failed to fetch cart" });
   }
 };
+
 
 /**
  * @desc    Add product to cart

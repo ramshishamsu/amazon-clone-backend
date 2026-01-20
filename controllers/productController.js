@@ -8,31 +8,45 @@ export const getProducts = async (req, res) => {
   try {
     const { category, rating, minPrice, maxPrice, search } = req.query;
 
-    let filter = {};
+    let filters = [];
 
-    if (category) filter.category = { $regex: category, $options: 'i' };
-    if (rating) filter.rating = { $gte: Number(rating) };
+    // Category filter
+    if (category) {
+      filters.push({
+        category: { $regex: `^${category}$`, $options: "i" }
+      });
+    }
+
+    // Rating filter
+    if (rating) {
+      filters.push({
+        rating: { $gte: Number(rating) }
+      });
+    }
+
+    // Price filter
     if (minPrice || maxPrice) {
-      filter.price = {};
-      if (minPrice) filter.price.$gte = Number(minPrice);
-      if (maxPrice) filter.price.$lte = Number(maxPrice);
+      const priceFilter = {};
+      if (minPrice) priceFilter.$gte = Number(minPrice);
+      if (maxPrice) priceFilter.$lte = Number(maxPrice);
+
+      filters.push({ price: priceFilter });
     }
 
-    // Add search functionality
+    // Search filter
     if (search) {
-      const searchFilter = {
+      filters.push({
         $or: [
-          { name: { $regex: search, $options: 'i' } },
-          { description: { $regex: search, $options: 'i' } },
-          { category: { $regex: search, $options: 'i' } }
+          { name: { $regex: search, $options: "i" } },
+          { description: { $regex: search, $options: "i" } },
+          { category: { $regex: search, $options: "i" } }
         ]
-      };
-
-      // Merge with existing filters
-      filter = { ...filter, ...searchFilter };
+      });
     }
 
-    const products = await Product.find(filter);
+    const query = filters.length ? { $and: filters } : {};
+
+    const products = await Product.find(query);
     res.json(products);
   } catch (error) {
     res.status(500).json({ message: error.message });
