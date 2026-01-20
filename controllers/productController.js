@@ -10,7 +10,7 @@ export const getProducts = async (req, res) => {
 
     let filter = {};
 
-    if (category) filter.category = category;
+    if (category) filter.category = { $regex: category, $options: 'i' };
     if (rating) filter.rating = { $gte: Number(rating) };
     if (minPrice || maxPrice) {
       filter.price = {};
@@ -20,11 +20,16 @@ export const getProducts = async (req, res) => {
 
     // Add search functionality
     if (search) {
-      filter.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } },
-        { category: { $regex: search, $options: 'i' } }
-      ];
+      const searchFilter = {
+        $or: [
+          { name: { $regex: search, $options: 'i' } },
+          { description: { $regex: search, $options: 'i' } },
+          { category: { $regex: search, $options: 'i' } }
+        ]
+      };
+
+      // Merge with existing filters
+      filter = { ...filter, ...searchFilter };
     }
 
     const products = await Product.find(filter);
